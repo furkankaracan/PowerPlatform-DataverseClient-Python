@@ -96,10 +96,17 @@ class _ODataClient(_FileUploadMixin, _RelationshipOperationsMixin):
 
         Dataverse LogicalNames for attributes are stored lowercase, but users may
         provide PascalCase names (matching SchemaName). This normalizes the input.
+
+        Keys containing ``@odata.`` (e.g. ``new_CustomerId@odata.bind``) are
+        preserved as-is because the navigation property portion before ``@``
+        must retain its original casing (case-sensitive navigation property name).  The OData
+        parser validates ``@odata.bind`` property names **case-sensitively**
+        against the entity's declared navigation properties, so lowercasing
+        these keys causes ``400 - undeclared property`` errors.
         """
         if not isinstance(record, dict):
             return record
-        return {k.lower() if isinstance(k, str) else k: v for k, v in record.items()}
+        return {k.lower() if isinstance(k, str) and "@odata." not in k else k: v for k, v in record.items()}
 
     @staticmethod
     def _lowercase_list(items: Optional[List[str]]) -> Optional[List[str]]:
@@ -720,7 +727,7 @@ class _ODataClient(_FileUploadMixin, _RelationshipOperationsMixin):
         params = {}
         if select:
             # Lowercase column names for case-insensitive matching
-            params["$select"] = ",".join(select)
+            params["$select"] = ",".join(self._lowercase_list(select))
         entity_set = self._entity_set_from_schema_name(table_schema_name)
         url = f"{self.api}/{entity_set}{self._format_key(key)}"
         r = self._request("get", url, params=params)
@@ -1319,6 +1326,9 @@ class _ODataClient(_FileUploadMixin, _RelationshipOperationsMixin):
         out = record.copy()
         for k, v in list(out.items()):
             if not isinstance(v, str) or not v.strip():
+                continue
+            # Skip OData annotations — they are not attribute names
+            if isinstance(k, str) and "@odata." in k:
                 continue
             mapping = self._optionset_map(table_schema_name, k)
             if not mapping:

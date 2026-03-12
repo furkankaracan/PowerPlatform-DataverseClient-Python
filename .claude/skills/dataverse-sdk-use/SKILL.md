@@ -105,6 +105,20 @@ for page in client.records.get(
         print(f"{account['name']} - {contact.get('fullname', 'N/A')}")
 ```
 
+#### Create Records with Lookup Bindings (@odata.bind)
+```python
+# Set lookup fields using @odata.bind with PascalCase navigation property names
+# CORRECT: use the navigation property name (case-sensitive, must match $metadata)
+guid = client.records.create("new_ticket", {
+    "new_name": "TKT-001",
+    "new_CustomerId@odata.bind": f"/new_customers({customer_id})",
+    "new_AgentId@odata.bind": f"/new_agents({agent_id})",
+})
+
+# WRONG: lowercase navigation property causes 400 error
+# "new_customerid@odata.bind" -> ODataException: undeclared property 'new_customerid'
+```
+
 #### Update Records
 ```python
 # Single update
@@ -359,6 +373,7 @@ except ValidationError as e:
 - Check filter/expand parameters use correct case
 - Verify column names exist and are spelled correctly
 - Ensure custom columns include customization prefix
+- For `@odata.bind` errors ("undeclared property"): the navigation property name before `@odata.bind` is case-sensitive and must match the entity's `$metadata` exactly (e.g., `new_CustomerId@odata.bind` for custom lookups, `parentaccountid@odata.bind` for system lookups). The SDK preserves `@odata.bind` key casing.
 
 ## Best Practices
 
@@ -371,7 +386,7 @@ except ValidationError as e:
 5. **Use production credentials** - ClientSecretCredential or CertificateCredential for unattended operations
 6. **Error handling** - Implement retry logic for transient errors (`e.is_transient`)
 7. **Always include customization prefix** for custom tables/columns
-8. **Use lowercase** - Generally using lowercase input won't go wrong, except for custom table/column naming
+8. **Use lowercase for column names, match `$metadata` for navigation properties** - Column names in `$select`/`$filter`/record payloads use lowercase LogicalNames. Navigation properties in `$expand` and `@odata.bind` keys are case-sensitive and must match the entity's `$metadata` (PascalCase for custom lookups like `new_CustomerId`, lowercase for system lookups like `parentaccountid`)
 9. **Test in non-production environments** first
 10. **Use named constants** - Import cascade behavior constants from `PowerPlatform.Dataverse.common.constants`
 
