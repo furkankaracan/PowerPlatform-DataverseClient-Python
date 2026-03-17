@@ -16,7 +16,7 @@ A Python client library for Microsoft Dataverse that provides a unified interfac
 - [Key features](#key-features)
 - [Getting started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Install the package](#install-the-package)  
+  - [Install the package](#install-the-package)
   - [Authenticate the client](#authenticate-the-client)
 - [Key concepts](#key-concepts)
 - [Examples](#examples)
@@ -36,7 +36,7 @@ A Python client library for Microsoft Dataverse that provides a unified interfac
 
 - **🔄 CRUD Operations**: Create, read, update, and delete records with support for bulk operations and automatic retry
 - **⚡ True Bulk Operations**: Automatically uses Dataverse's native `CreateMultiple`, `UpdateMultiple`, `UpsertMultiple`, and `BulkDelete` Web API operations for maximum performance and transactional integrity
-- **📊 SQL Queries**: Execute read-only SQL queries via the Dataverse Web API `?sql=` parameter  
+- **📊 SQL Queries**: Execute read-only SQL queries via the Dataverse Web API `?sql=` parameter
 - **🏗️ Table Management**: Create, inspect, and delete custom tables and columns programmatically
 - **🔗 Relationship Management**: Create one-to-many and many-to-many relationships between tables with full metadata control
 - **📎 File Operations**: Upload files to Dataverse file columns with automatic chunking for large files
@@ -47,7 +47,7 @@ A Python client library for Microsoft Dataverse that provides a unified interfac
 
 ### Prerequisites
 
-- **Python 3.10+** (3.10, 3.11, 3.12, 3.13 supported)  
+- **Python 3.10+** (3.10, 3.11, 3.12, 3.13 supported)
 - **Microsoft Dataverse environment** with appropriate permissions
 - **OAuth authentication configured** for your application
 
@@ -67,6 +67,7 @@ pip install PowerPlatform-Dataverse-Client && dataverse-install-claude-skill
 ```
 
 This installs two Claude Skills that enable Claude Code to:
+
 - **dataverse-sdk-use**: Apply SDK best practices for using the SDK in your applications
 - **dataverse-sdk-dev**: Provide guidance for developing/contributing to the SDK itself
 
@@ -86,7 +87,7 @@ The client requires any Azure Identity `TokenCredential` implementation for OAut
 
 ```python
 from azure.identity import (
-    InteractiveBrowserCredential, 
+    InteractiveBrowserCredential,
     ClientSecretCredential,
     CertificateCredential,
     AzureCliCredential
@@ -97,7 +98,7 @@ from PowerPlatform.Dataverse.client import DataverseClient
 credential = InteractiveBrowserCredential()  # Browser authentication
 # credential = AzureCliCredential()          # If logged in via 'az login'
 
-# Production options  
+# Production options
 # credential = ClientSecretCredential(tenant_id, client_id, client_secret)
 # credential = CertificateCredential(tenant_id, client_id, cert_path)
 
@@ -110,16 +111,16 @@ client = DataverseClient("https://yourorg.crm.dynamics.com", credential)
 
 The SDK provides a simple, pythonic interface for Dataverse operations:
 
-| Concept | Description |
-|---------|-------------|
-| **DataverseClient** | Main entry point; provides `records`, `query`, `tables`, and `files` namespaces |
-| **Context Manager** | Use `with DataverseClient(...) as client:` for automatic cleanup and HTTP connection pooling |
-| **Namespaces** | Operations are organized into `client.records` (CRUD & OData queries), `client.query` (query & search), `client.tables` (metadata), and `client.files` (file uploads) |
-| **Records** | Dataverse records represented as Python dictionaries with column schema names |
-| **Schema names** | Use table schema names (`"account"`, `"new_MyTestTable"`) and column schema names (`"name"`, `"new_MyTestColumn"`). See: [Table definitions in Microsoft Dataverse](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/entity-metadata) |
-| **Bulk Operations** | Efficient bulk processing for multiple records with automatic optimization |
-| **Paging** | Automatic handling of large result sets with iterators |
-| **Structured Errors** | Detailed exception hierarchy with retry guidance and diagnostic information |
+| Concept                         | Description                                                                                                                                                                                                                                                                              |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **DataverseClient**             | Main entry point; provides `records`, `query`, `tables`, and `files` namespaces                                                                                                                                                                                                          |
+| **Context Manager**             | Use `with DataverseClient(...) as client:` for automatic cleanup and HTTP connection pooling                                                                                                                                                                                             |
+| **Namespaces**                  | Operations are organized into `client.records` (CRUD & OData queries), `client.query` (query & search), `client.tables` (metadata), and `client.files` (file uploads)                                                                                                                    |
+| **Records**                     | Dataverse records represented as Python dictionaries with column schema names                                                                                                                                                                                                            |
+| **Schema names**                | Use table schema names (`"account"`, `"new_MyTestTable"`) and column schema names (`"name"`, `"new_MyTestColumn"`). See: [Table definitions in Microsoft Dataverse](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/entity-metadata)                                |
+| **Bulk Operations**             | Efficient bulk processing for multiple records with automatic optimization                                                                                                                                                                                                               |
+| **Paging**                      | Automatic handling of large result sets with iterators                                                                                                                                                                                                                                   |
+| **Structured Errors**           | Detailed exception hierarchy with retry guidance and diagnostic information                                                                                                                                                                                                              |
 | **Customization prefix values** | Custom tables and columns require a customization prefix value to be included for all operations (e.g., `"new_MyTestTable"`, not `"MyTestTable"`). See: [Table definitions in Microsoft Dataverse](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/entity-metadata) |
 
 ## Examples
@@ -266,6 +267,7 @@ for page in client.records.get(
 ```
 
 > **Important**: When using `filter` and `expand` parameters:
+>
 > - **`filter`**: Column names must use exact lowercase logical names (e.g., `"statecode eq 0"`, not `"StateCode eq 0"`)
 > - **`expand`**: Navigation property names are case-sensitive and must match the exact server names
 > - **`select`** and **`orderby`**: Case-insensitive; automatically converted to lowercase
@@ -394,10 +396,12 @@ client.files.upload(
 Explore our comprehensive examples in the [`examples/`](https://github.com/microsoft/PowerPlatform-DataverseClient-Python/tree/main/examples) directory:
 
 **🌱 Getting Started:**
+
 - **[Installation & Setup](https://github.com/microsoft/PowerPlatform-DataverseClient-Python/blob/main/examples/basic/installation_example.py)** - Validate installation and basic usage patterns
 - **[Functional Testing](https://github.com/microsoft/PowerPlatform-DataverseClient-Python/blob/main/examples/basic/functional_testing.py)** - Test core functionality in your environment
 
 **🚀 Advanced Usage:**
+
 - **[Complete Walkthrough](https://github.com/microsoft/PowerPlatform-DataverseClient-Python/blob/main/examples/advanced/walkthrough.py)** - Full feature demonstration with production patterns
 - **[Relationship Management](https://github.com/microsoft/PowerPlatform-DataverseClient-Python/blob/main/examples/advanced/relationships.py)** - Create and manage table relationships
 - **[File Upload](https://github.com/microsoft/PowerPlatform-DataverseClient-Python/blob/main/examples/advanced/file_upload.py)** - Upload files to Dataverse file columns
@@ -408,13 +412,13 @@ Explore our comprehensive examples in the [`examples/`](https://github.com/micro
 
 For comprehensive information on Microsoft Dataverse and related technologies:
 
-| Resource | Description |
-|----------|-------------|
-| **[Dataverse Developer Guide](https://learn.microsoft.com/power-apps/developer/data-platform/)** | Complete developer documentation for Microsoft Dataverse |
-| **[Dataverse Web API Reference](https://learn.microsoft.com/power-apps/developer/data-platform/webapi/)** | Detailed Web API reference and examples |  
-| **[Azure Identity for Python](https://learn.microsoft.com/python/api/overview/azure/identity-readme)** | Authentication library documentation and credential types |
-| **[Power Platform Developer Center](https://learn.microsoft.com/power-platform/developer/)** | Broader Power Platform development resources |
-| **[Dataverse SDK for .NET](https://learn.microsoft.com/power-apps/developer/data-platform/org-service/overview)** | Official .NET SDK for Microsoft Dataverse |
+| Resource                                                                                                          | Description                                               |
+| ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| **[Dataverse Developer Guide](https://learn.microsoft.com/power-apps/developer/data-platform/)**                  | Complete developer documentation for Microsoft Dataverse  |
+| **[Dataverse Web API Reference](https://learn.microsoft.com/power-apps/developer/data-platform/webapi/)**         | Detailed Web API reference and examples                   |
+| **[Azure Identity for Python](https://learn.microsoft.com/python/api/overview/azure/identity-readme)**            | Authentication library documentation and credential types |
+| **[Power Platform Developer Center](https://learn.microsoft.com/power-platform/developer/)**                      | Broader Power Platform development resources              |
+| **[Dataverse SDK for .NET](https://learn.microsoft.com/power-apps/developer/data-platform/org-service/overview)** | Official .NET SDK for Microsoft Dataverse                 |
 
 ## Troubleshooting
 
@@ -441,6 +445,7 @@ except ValidationError as e:
 ### Authentication issues
 
 **Common fixes:**
+
 - Verify environment URL format: `https://yourorg.crm.dynamics.com` (no trailing slash)
 - Ensure Azure Identity credentials have proper Dataverse permissions
 - Check app registration permissions are granted and admin-consented
@@ -449,14 +454,14 @@ except ValidationError as e:
 
 For optimal performance in production environments:
 
-| Best Practice | Description |
-|---------------|-------------|
-| **Bulk Operations** | Pass lists to `records.create()`, `records.update()` for automatic bulk processing, for `records.delete()`, set `use_bulk_delete` when passing lists to use bulk operation |
-| **Select Fields** | Specify `select` parameter to limit returned columns and reduce payload size |
-| **Page Size Control** | Use `top` and `page_size` parameters to control memory usage |
-| **Connection Reuse** | Reuse `DataverseClient` instances across operations |
-| **Production Credentials** | Use `ClientSecretCredential` or `CertificateCredential` for unattended operations |
-| **Error Handling** | Implement retry logic for transient errors (`e.is_transient`) |
+| Best Practice              | Description                                                                                                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bulk Operations**        | Pass lists to `records.create()`, `records.update()` for automatic bulk processing, for `records.delete()`, set `use_bulk_delete` when passing lists to use bulk operation |
+| **Select Fields**          | Specify `select` parameter to limit returned columns and reduce payload size                                                                                               |
+| **Page Size Control**      | Use `top` and `page_size` parameters to control memory usage                                                                                                               |
+| **Connection Reuse**       | Reuse `DataverseClient` instances across operations                                                                                                                        |
+| **Production Credentials** | Use `ClientSecretCredential` or `CertificateCredential` for unattended operations                                                                                          |
+| **Error Handling**         | Implement retry logic for transient errors (`e.is_transient`)                                                                                                              |
 
 ### Limitations
 

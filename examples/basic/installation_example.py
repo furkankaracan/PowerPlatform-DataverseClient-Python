@@ -55,10 +55,17 @@ Prerequisites for Interactive Testing:
 """
 
 # Standard imports
+import os
 import sys
 import subprocess
 from typing import Optional
 from datetime import datetime
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed; .env file will not be loaded
 
 from PowerPlatform.Dataverse.operations.records import RecordOperations
 from PowerPlatform.Dataverse.operations.query import QueryOperations
@@ -291,21 +298,27 @@ def interactive_test():
     print("\nDataverse Environment Setup")
     print("-" * 50)
 
-    if not sys.stdin.isatty():
-        print("  [ERR] Interactive input required for testing")
-        return
-
-    org_url = input("Enter your Dataverse org URL (e.g., https://yourorg.crm.dynamics.com): ").strip()
-    if not org_url:
-        print("  [WARN] No URL provided, skipping test")
-        return
+    org_url = os.getenv("DATAVERSE_URL", "").strip()
+    if org_url:
+        print(f"  [OK] Using DATAVERSE_URL from .env: {org_url}")
+    else:
+            print("  [ERR] Interactive input required for testing")
+            return
+    
+    tenant_id = os.getenv("AZURE_TENANT_ID", "").strip()
+    client_id = os.getenv("AZURE_CLIENT_ID", "").strip()
+    client_secret = os.getenv("AZURE_CLIENT_SECRET", "").strip()
 
     try:
         from PowerPlatform.Dataverse.client import DataverseClient
-        from azure.identity import InteractiveBrowserCredential
+        from azure.identity import ClientSecretCredential
 
         print("  Setting up authentication...")
-        credential = InteractiveBrowserCredential()
+        credential = ClientSecretCredential(
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret
+        )
 
         print("  Creating client...")
         with DataverseClient(org_url.rstrip("/"), credential) as client:
